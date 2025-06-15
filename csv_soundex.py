@@ -1,3 +1,7 @@
+# csv_soundex.py
+# Version 1.0.0 vom 15.06.2025
+# Erstellt eine CSV mit Soundex-Spalten für deutsche Namen unter Berücksichtigung deutscher Phonetik.
+
 import csv
 import sys
 import os
@@ -118,7 +122,6 @@ def normalize_german_phonetics(word):
     word = word.replace("$", "sch").replace("#", "ch")
     return word
 
-
 def german_soundex(word):
     """
     Deutsche Soundex-Variante, berücksichtigt Umlaute und phonetische Besonderheiten.
@@ -201,11 +204,9 @@ def csv_soundex(input_csv, columns):
     print(f"Fertig! Neue Datei: {output_csv}")
 
 if __name__ == "__main__":
-    # if len(sys.argv) != 3:
-    #     print("Aufruf: python soundex_csv.py <csv_datei> <spalten1,spalten2,...>")
-    #     sys.exit(1)
-    # input_csv = sys.argv[1]
-    # columns = [col.strip() for col in sys.argv[2].split(",")]
-    input_csv = "FBILLINGEN_NAME.csv"
-    columns = ["NAME","SURN","GIVN"]
+    if len(sys.argv) != 3:
+        print("Aufruf: python soundex_csv.py <csv_datei> <spalten1,spalten2,...>")
+        sys.exit(1)
+    input_csv = sys.argv[1]
+    columns = [col.strip() for col in sys.argv[2].split(",")]
     csv_soundex(input_csv, columns)
