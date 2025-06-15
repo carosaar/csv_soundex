@@ -1,43 +1,129 @@
 # Soundex für die deutsche Begriffe in Tabellen im CSV-Format
 
-**Version:** 1.0.0  
+**Version:** 1.0.1  
 **Datum:** 15.06.2025
-**Autor:** Dieter Eckstein
 
-## Aufgabe
+## Beschreibung
 
-Dieses Python-Projekt erweitert eine CSV-Datei um Soundex-Spalten für deutsche Namen.  
-Der Soundex-Algorithmus wird dabei durch eine phonetische Vorverarbeitung an die Besonderheiten der deutschen Sprache angepasst.  
-Das Ziel ist es, phonetisch ähnliche Namen (wie „Colling“ und „Kolling“) mit demselben Code zu erfassen und so die Dublettenprüfung oder Namenssuche zu erleichtern.
+Dieses Python-Programm bietet eine grafische Oberfläche (GUI) und einen Konsolenmodus, um CSV-Dateien um Soundex-Spalten für deutsche Namen zu erweitern.  
+Der Soundex-Algorithmus wurde speziell an die phonetischen Besonderheiten der deutschen Sprache angepasst.  
+Das Ziel ist es, phonetisch ähnliche Namen (wie „Müller“ und „Mueller“) mit demselben Code zu erfassen und so die Dublettenprüfung oder Namenssuche zu erleichtern.
 
-## Lösung
+---
 
-- Das Script liest eine CSV-Datei ein und berechnet für eine oder mehrere angegebene Spalten einen deutschen Soundex-Code.
-- Die phonetische Vorverarbeitung berücksichtigt deutsche Aussprachebesonderheiten, z.B. Umlaute, „ch“, „sch“, „c“/„k“, Diphthonge, „sp“/„st“ am Wortanfang, u.v.m.
-- Für numerische Werte oder reine Sonderzeichen wird der Originalwert übernommen.
-- Die neuen Soundex-Spalten werden als `_soundex` an die CSV-Datei angehängt.
+## Features
+
+- **GUI-Modus:**  
+  - Auswahl einer CSV-Datei per Dialog
+  - Anzeige des Dateipfads mit intelligentem Zeilenumbruch
+  - Übersichtliche Mehrfachauswahl der Spalten (Checkboxen), gruppiert in Spalten zu je 10 Zeilen
+  - Start der Verarbeitung per Button
+  - INFO-Button mit Programmbeschreibung
+  - Bearbeiten-Button (startet die Verarbeitung)
+  - Beenden-Button
+  - Anzeige des Ausgabepfads nach erfolgreicher Verarbeitung
+  - Fenstergröße 600x400, horizontal veränderbar
+
+- **Konsolenmodus:**  
+  - Aufruf mit Parametern möglich
+  - Ausgabe des Ausgabepfads nach erfolgreicher Verarbeitung
+
+---
 
 ## Voraussetzungen
 
 - Python 3.7 oder neuer
 - Keine externen Bibliotheken notwendig (nur Standardbibliothek)
+- Die Datei `csv_soundex.py` muss sich im gleichen Verzeichnis befinden und die Funktion `csv_soundex(input_csv, columns)` bereitstellen
+
+---
 
 ## Installation
 
 Kein Installationsschritt notwendig.  
-Speichere das Script z.B. als `soundex_csv.py`.
+Speichere das Script z.B. als `csv_soundex_gui.py` und stelle sicher, dass `csv_soundex.py` im gleichen Verzeichnis liegt.
+
+**Optional: Kompilieren zu einer ausführbaren Datei (EXE)**
+Falls das Programm ohne Python-Installation auf anderen Rechnern genutzt werden soll, kannst es mit Tools wie PyInstaller oder cx_Freeze in eine ausführbare Datei (z.B. .exe für Windows) umwandeln:
+
+Beispiel mit PyInstaller
+PyInstaller installieren (falls noch nicht vorhanden):
+
+```bash
+pip install pyinstaller
+```
+EXE erstellen:
+```bash
+pyinstaller --onefile csv_soundex_gui.py
+```
+Die ausführbare Datei findet sich dann im Ordner dist/.
+
+---
 
 ## Nutzung
 
+### GUI-Modus (Standard)
+
 ```bash
-python soundex_csv.py  
+python csv_soundex_gui.py
+```
+
+- Wähle eine CSV-Datei aus.
+- Wähle eine oder mehrere Spalten für die Soundex-Verarbeitung.
+- Starte die Verarbeitung mit dem 🛠️ Bearbeiten-Button.
+- Die neue Datei wird im gleichen Verzeichnis gespeichert und der Pfad angezeigt.
+
+---
+
+### Konsolenmodus
+
+```bash
+python csv_soundex_gui.py --konsole  
 ```
 
 **Beispiel:**
 ```bash
-python soundex_csv.py kunden.csv Nachname,Vorname
+python csv_soundex_gui.py --konsole beispiel.csv Name,Ort
 ```
-Das Ergebnis wird als `kunden_soundex.csv` gespeichert.
+- Die neuen Soundex-Spalten werden wie gewohnt erzeugt.
+- Nach Abschluss wird der Pfad der Ausgabedatei auf der Konsole ausgegeben.
+
+---
+
+## Beispiel-CSV
+
+```csv
+ID,Vorname,Name,Ort
+1,Andreas,Schäfer,Berlin
+2,Petra,Schäffer,Hamburg
+3,Johann,Mueller,München
+4,Julia,Müller,Frankfurt
+...
+```
+Eine vollständige Testdatei mit vielen phonetischen Varianten ist im github-Verzeichnis hinterlegt.
+
+---
+
+## Hinweise zu den phonetischen Besonderheiten
+
+Das Programm berücksichtigt u.a.:
+- Umlaute und deren Umschreibungen: ä/ae, ö/oe, ü/ue, ß/ss
+- Diphthonge und Varianten: Meier/Mayer, Seitz/Seiz
+- ph/f/v/w, ck/k/ch, th/t, qu/kw, c/k/z, sch/sh, Doppelkonsonanten
+- Namensendungen und -varianten
+
+---
+
+## Lizenz
+
+Dieses Projekt ist frei nutzbar für private und wissenschaftliche Zwecke.
+
+---
+
+**Viel Erfolg beim Einsatz!**  
+Für Fragen, Verbesserungen oder Anpassungen gerne melden.
+
+---
 
 ## Beschreibung der Behandlung der deutschen Aussprache
 Im Script werden folgende Besonderheiten der deutschen Aussprache behandelt und in der Vorverarbeitung umgesetzt:

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # soundex_gui.py
-# Version 1.0.0 vom 15.06.2025
+# Version 1.0.1 vom 15.06.2025
 
 """
-GUI-Tool für deutschen Soundex-Abgleich in CSV-Dateien
+GUI- und Konsolen-Tool für deutschen Soundex-Abgleich in CSV-Dateien
 
 Beschreibung:
 Dieses Programm bietet eine grafische Oberfläche zur Auswahl einer CSV-Datei und zur Auswahl von Spalten,
@@ -11,28 +11,20 @@ für die ein phonetischer Soundex-Code nach deutschen Aussprache-Regeln berechne
 Die Verarbeitung erfolgt über die Funktion csv_soundex() aus der Datei csv_soundex.py.
 Die neuen Spalten werden als <Spalte>_soundex in einer neuen Datei gespeichert.
 
-Funktionen:
-- Auswahl einer CSV-Datei per Dialog
-- Anzeige des Dateipfads mit intelligentem Zeilenumbruch an Verzeichnis-Trennern
-- Anzeige der Spaltenüberschriften mit Mehrfachauswahl (Checkboxen), gruppiert in Spalten zu je 10 Zeilen
-- Buttons für INFO (Beschreibung), Bearbeiten (Soundex-Verarbeitung starten), Beenden (Programm schließen)
-- Nach der Verarbeitung wird der Pfad der Ausgabedatei angezeigt
-- Fenstergröße 600x400, horizontal veränderbar
+Zusatzfunktion (ab Version 1.0.1):
+Das Script kann auch als Konsolen-Tool aufgerufen werden:
+    python soundex_gui.py --konsole <csv-datei> <spalte1,spalte2,...>
 
-Version: 1.0.0 vom 15.06.2025
-Autor: Dieter Eckstein
+Version: 1.0.1 vom 15.06.2025
 """
 
 import tkinter as tk
 from tkinter import filedialog, messagebox
 import csv
 import os
+import sys
 import importlib.util
-
-# Dynamischer Import von csv_soundex.py
-spec = importlib.util.spec_from_file_location("csv_soundex", os.path.join(os.path.dirname(__file__), "csv_soundex.py"))
-csv_soundex_mod = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(csv_soundex_mod)
+from csv_soundex import csv_soundex
 
 def smart_path_wrap(path, maxlen=60):
     """
@@ -44,7 +36,7 @@ def smart_path_wrap(path, maxlen=60):
     parts = norm_path.split("/")
     lines = []
     current_line = ""
-    for i, part in enumerate(parts):
+    for part in parts:
         # +1 für den "/" (außer am Anfang)
         if current_line and len(current_line) + len(part) + 1 > maxlen:
             lines.append(current_line + "/")
@@ -57,7 +49,6 @@ def smart_path_wrap(path, maxlen=60):
     if current_line:
         lines.append(current_line)
     return "\n".join(lines)
-
 
 class SoundexGUI(tk.Tk):
     def __init__(self):
@@ -158,7 +149,7 @@ class SoundexGUI(tk.Tk):
             messagebox.showwarning("Hinweis", "Bitte wählen Sie mindestens eine Spalte aus.")
             return
         try:
-            output_file = csv_soundex_mod.csv_soundex(self.csv_file, selected_columns)
+            output_file = csv_soundex(self.csv_file, selected_columns)
             if output_file is None:
                 base, ext = os.path.splitext(self.csv_file)
                 output_file = f"{base}_soundex{ext}"
@@ -169,14 +160,35 @@ class SoundexGUI(tk.Tk):
     def show_info(self):
         info_text = (
             "Deutscher Soundex für CSV-Dateien\n"
-            "Version 1.0.0 (15.06.2025)\n\n"
+            "Version 1.0.1 (15.06.2025)\n\n"
             "Dieses Programm ermöglicht die Auswahl einer CSV-Datei und die Markierung von Spalten, "
             "für die ein phonetischer Soundex-Code nach deutschen Aussprache-Regeln berechnet wird. "
             "Die Verarbeitung erfolgt durch die Funktion csv_soundex() aus der Datei csv_soundex.py.\n\n"
-            "Die neuen Spalten werden als <Spalte>_soundex in einer neuen Datei gespeichert."
+            "Die neuen Spalten werden als <Spalte>_soundex in einer neuen Datei gespeichert.\n\n"
+            "Konsolenmodus:\n"
+            "python soundex_gui.py --konsole <csv-datei> <spalte1,spalte2,...>"
         )
         messagebox.showinfo("INFO", info_text)
 
+def run_console_mode():
+    if len(sys.argv) != 4:
+        print("Konsolenmodus:\npython soundex_gui.py --konsole <csv-datei> <spalte1,spalte2,...>")
+        sys.exit(1)
+    input_csv = sys.argv[2]
+    columns = [col.strip() for col in sys.argv[3].split(",")]
+    try:
+        output_file = csv_soundex(input_csv, columns)
+        if output_file is None:
+            base, ext = os.path.splitext(input_csv)
+            output_file = f"{base}_soundex{ext}"
+        print(f"Die Verarbeitung ist abgeschlossen.\nDie neue Datei wurde erstellt:\n{os.path.abspath(output_file)}")
+    except Exception as e:
+        print(f"Fehler bei der Verarbeitung: {e}")
+        sys.exit(1)
+
 if __name__ == "__main__":
-    app = SoundexGUI()
-    app.mainloop()
+    if len(sys.argv) > 1 and sys.argv[1] == "--konsole":
+        run_console_mode()
+    else:
+        app = SoundexGUI()
+        app.mainloop()
